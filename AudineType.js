@@ -97,7 +97,6 @@ class Audinetype{
       if(__this.all === true){
           __this.element = doc.querySelector()
       }
-      this.type = typeof this.element
       this.data = {
           ago(replace, tab){
               let terms = tab
@@ -131,6 +130,7 @@ class Audinetype{
 
       }
   }
+  type(){ typeof this.element }
   debounce(callback, delay){
         let timer
         return function(){
