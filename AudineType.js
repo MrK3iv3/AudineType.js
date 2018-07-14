@@ -1,38 +1,5 @@
 "use strict";
 
-let __this = this
-let doc = document
-if ('WebSocket' in window) {
-    (function () {
-        function refreshCSS() {
-            var sheets = [].slice.call(doc.getElementsByTagName("link"));
-            var head = doc.getElementsByTagName("head")[0];
-            for (var i = 0; i < sheets.length; ++i) {
-                var elem = sheets[i];
-                head.removeChild(elem);
-                var rel = elem.rel;
-                if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-                    var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-                    elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-                }
-                head.appendChild(elem);
-            }
-        }
-        var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-        var address = protocol + window.location.host + window.location.pathname + '/ws';
-        var socket = new WebSocket(address);
-        socket.onmessage = function (msg) {
-            if (msg.data == 'reload') window.location.reload();
-            else if (msg.data == 'refreshcss') refreshCSS();
-        };
-        if(sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-            console.log('Live reload enabled.');
-            sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-        }
-    })();
-}
-else console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.')
-
 if(NodeList.prototype.forEach === undefined){
     NodeList.prototype.forEach = function(callback){
         [].forEach.call(this, callback)
@@ -40,12 +7,12 @@ if(NodeList.prototype.forEach === undefined){
 }
 function toScrollX(){
     let supportPageOffset = window.pageXOffset !== undefined;
-    let isCSS1Compat = ((doc.compatMode || "") === "CSS1Compat");
+    let isCSS1Compat = ((document.compatMode || "") === "CSS1Compat");
     let x = supportPageOffset ? window.pageXOffset : isCSS1Compat ? doc.documentElement.scrollLeft : doc.body.scrollLeft;
 }
 function toScrollY(){
     let supportPageOffset = window.pageXOffset !== undefined;
-    let isCSS1Compat = ((doc.compatMode || "") === "CSS1Compat");
+    let isCSS1Compat = ((document.compatMode || "") === "CSS1Compat");
     let y = supportPageOffset ? window.pageYOffset : isCSS1Compat ? doc.documentElement.scrollTop : doc.body.scrollTop;
 }
 class DiscordBot{
@@ -92,181 +59,196 @@ class DiscordBot{
         }
     }
 }
-class Audinetype{
-  constructor(element, all){
-      if(__this.all === true){
-          __this.element = doc.querySelector()
-      }
-      this.data = {
-          ago(replace, tab){
-              let terms = tab
-              doc.querySelectorAll('[data-ago]').forEach(function(node){
-                  function setText(){
-                      let secondes = Math.floor((new Date()).getTime() / 1000 - parseInt(node.getAttribute('data-ago'), 10))
-                      let prefix = secondes >= 0 ?'Il y a ' : 'Dans '
-                      secondes = Math.abs(secondes)
-                      let term
-                      for(term of terms){
-                          if(secondes < term.time){
-                              break
-                          }
-                      }
-                      node.innerHTML = prefix + term.text.replace(replace, Math.round(secondes / term.divide))
-                      let nextTick = secondes %  term.divide
-                      if(nextTick === 0){
-                          nextTick = term.divide
-                      }
-                      window.setTimeout(function(){
-                          if(node.parentNode){
-                              setText()
-                          }
-                      }, nextTick*1000)
-                  }
+class Audine{
+  constructor(elements, all){
+    this.all = all
+    if(this.all === true){
+      this.elements = document.querySelectorAll(elements)
+    }
+    this.Type = {
+      data: {
+        ago(replace, tab){
+          let terms = tab
+          document.querySelectorAll('[data-ago]').forEach(function(node){
+            function setText(){
+              let secondes = Math.floor((new Date()).getTime() / 1000 - parseInt(node.getAttribute('data-ago'), 10))
+              let prefix = secondes >= 0 ?'Il y a ' : 'Dans '
+              secondes = Math.abs(secondes)
+              let term
+              for(term of terms){
+                if(secondes < term.time){
+                  break
+                }
+              }
+              node.innerHTML = prefix + term.text.replace(replace, Math.round(secondes / term.divide))
+              let nextTick = secondes %  term.divide
+              if(nextTick === 0){
+                nextTick = term.divide
+              }
+              window.setTimeout(function(){
+                if(node.parentNode){
                   setText()
-              })
-          }
-      }
-      this.css = {
-
-      }
-  }
-  type(){ typeof this.element }
-  debounce(callback, delay){
+                }
+              }, nextTick*1000)
+            }
+            setText()
+          })
+        }
+      },
+      css: {
+        addClass(Class){
+          $A().elements.forEach((element) => element.NodeList.add(Class))
+        },
+        removeClass(Class){
+          let elements = document.querySelectorAll(elements)
+          elements.forEach((element) => {
+            element.NodeList.remove(Class)
+          })
+        },
+        toogleClass(Class){
+          let elements = document.querySelectorAll(elements)
+          elements.forEach((element) => {
+            element.NodeList.toogle(Class)
+          })
+        }
+      },
+      type(value){ return typeof value},
+      debounce(callback, delay){
         let timer
         return function(){
-            let args = arguments;
-            let context = this;
-            clearTimeout(timer);
-            timer = setTimeout(function(){
-                callback.apply(context, args);
-            }, delay)
+          let args = arguments;
+          let context = this;
+          clearTimeout(timer);
+          timer = setTimeout(function(){
+            callback.apply(context, args);
+          }, delay)
         }
-    }
-  throttle(callback, delay){
+      },
+      throttle(callback, delay){
         let last, timer
         return function(){
-            var context = this;
-            var now = +new Date();
-            var args = arguments;
-            if(last && now < last + delay){
-                clearTimeout(timer);
-                timer = setTimeout(function(){
-                    last = now;
-                    callback.apply(context, args);
-                }, delay);
-            }else{
-                last = now;
-                callback.apply(context, args);
-            }
+          var context = this;
+          var now = +new Date();
+          var args = arguments;
+          if(last && now < last + delay){
+            clearTimeout(timer);
+            timer = setTimeout(function(){
+              last = now;
+              callback.apply(context, args);
+            }, delay);
+          }else{
+            last = now;
+            callback.apply(context, args);
+          }
         }
-    }
-  dragDrop(elementParent, elementChild){
-        const fill = doc.querySelector(elementChild)
+      },
+      dragDrop(elementParent, elementChild){
+        const fill = document.querySelector(elementChild)
         const empties = doc.querySelectorAll(elementParent)
         fill.addEventListener('dragstart', start)
         fill.addEventListener('dragend', end)
         empties.forEach((empty => {
-            empty.addEventListener('dragover', hover)
-            empty.addEventListener('dragenter', enter)
-            empty.addEventListener('dragleave', leave)
-            empty.addEventListener('drop', drop)            
+          empty.addEventListener('dragover', hover)
+          empty.addEventListener('dragenter', enter)
+          empty.addEventListener('dragleave', leave)
+          empty.addEventListener('drop', drop)            
         }))
         function start(){
-            this.className += ' hold'
-            setTimeout(() => this.className = 'invisible', 0)
+          this.className += ' hold'
+          setTimeout(() => this.className = 'invisible', 0)
         }
         function end(){
-            this.className = 'fill'
+          this.className = 'fill'
         }
         function hover(e) {
-            e.preventDefault()
+          e.preventDefault()
         }
         function enter(e) {
-            e.preventDefault()
-            this.className += ' hovered'
+          e.preventDefault()
+          this.className += ' hovered'
         }
         function leave() {
-            this.className = 'empty'
+          this.className = 'empty'
         }
         function drop() {
-            this.className = 'empty'
-            this.append(fill)
+          this.className = 'empty'
+          this.append(fill)
         }
-    }
-  spoiler(classSpoiler, text, classSpan, classButton){
-        let elements = doc.querySelectorAll(classSpoiler)
+      },
+      spoiler(classSpoiler, text, classSpan, classButton){
+        let elements = document.querySelectorAll(classSpoiler)
         function spoilerBtn(element){
-            let button = doc.createElement('button')
-            button.classList.add(classButton)
-            button.innerHTML = text
-        
-            let span = doc.createElement('span')
-            span.classList.add(classSpan)
-            span.innerHTML = element.innerHTML
-        
-            element.innerHTML = ''
-            element.appendChild(button)
-            element.appendChild(span)
-        
-            button.addEventListener('click', function(){
-                button.parentNode.removeChild(button)
-                span.classList.add('visible')
-            })
+          let button = doc.createElement('button')
+          button.classList.add(classButton)
+          button.innerHTML = text
+      
+          let span = doc.createElement('span')
+          span.classList.add(classSpan)
+          span.innerHTML = element.innerHTML
+      
+          element.innerHTML = ''
+          element.appendChild(button)
+          element.appendChild(span)
+      
+          button.addEventListener('click', function(){
+            button.parentNode.removeChild(button)
+            span.classList.add('visible')
+          })
         }
         for (let i = 0; i < elements.length; i++) {
-            spoilerBtn(elements[i])
+          spoilerBtn(elements[i])
         }
-    }
-  on(eventstring, callback){
+      },
+      on(eventstring, callback){
         if(eventstring === "ready"){
-            return doc.addEventListener("DOMContentLoaded", callback)
+          return document.addEventListener("DOMContentLoaded", callback)
         }
         return doc.addEventListener(eventstring, callback)
-    }
-  observerItem(){
-    let observer = new IntersectionObserver(function (observables) {
-      observables.forEach(function (observable) {
-        if (observable.intersectionRatio > 0.5) {
-          observable.target.classList.remove('not-visible')
-          observer.unobserve(observable.target)
-        }
-      })
-    }, {
-      threshold: [0.5]
-    });
-    let item = this.element
-    item.classList.add('not-visible')
-    observer.observe(item)
-  }
-  cap(string){
-    return (string.slice(0, 1).toUpperCase()) + string.slice(1)
-  }
-  maj(string){
-    return string.split(' ').map(mot => mot[0].toUpperCase() + mot.slice(1)).join((' '));
-  }
-  min(string){
-    return string.split(' ').map(mot => mot[0].toLowerCase() + mot.slice(1)).join((' '));
-  }
-  time(callback, delay){
+      },
+      observerItem(){
+        let observer = new IntersectionObserver(function (observables) {
+          observables.forEach(function (observable) {
+            if (observable.intersectionRatio > 0.5) {
+              observable.target.classList.remove('not-visible')
+              observer.unobserve(observable.target)
+            }
+          })
+        }, {
+          threshold: [0.5]
+        });
+        let item = this.element
+        item.classList.add('not-visible')
+        observer.observe(item)
+      },
+      cap(string){
+        return (string.slice(0, 1).toUpperCase()) + string.slice(1)
+      },
+      maj(string){
+        return string.split(' ').map(mot => mot[0].toUpperCase() + mot.slice(1)).join((' '));
+      },
+      min(string){
+        return string.split(' ').map(mot => mot[0].toLowerCase() + mot.slice(1)).join((' '));
+      },
+      newError(string){
+        throw new Error(string);
+      },
+      random(valueMin, valueMax){
+        if(valueMin != undefined){
+          let numberRandom
+          if(valueMin && valueMax != undefined || null){
+            numberRandom = Math.round(Math.random()* valueMax)
+            while(numberRandom < valueMin) numberRandom = Math.round(Math.random()* valueMax)
+            return numberRandom
+          }else if(valueMax == undefined && valueMin != undefined){
+            return numberRandom = Math.round(Math.random()* valueMin)
+          }
+        }else console.error("[AudineType(random)]: Vous devez avoir une valeur par default")
+      },
+      time(callback, delay){
         let times;
         return times = setInterval(callback, delay)
-    }
-  newError(string){
-        throw new Error(string);
-    }
-  random(valueMin, valueMax){
-        if(valueMin != undefined){
-            let numberRandom
-            if(valueMin && valueMax != undefined || null){
-                numberRandom = Math.round(Math.random()* valueMax)
-                while(numberRandom < valueMin) numberRandom = Math.round(Math.random()* valueMax)
-                return numberRandom
-            }else if(valueMax == undefined && valueMin != undefined){
-                return numberRandom = Math.round(Math.random()* valueMin)
-            }
-        }else console.error("[AudineType(random)]: Vous devez avoir une valeur par default")
-    }
-  colorPicker(options){
+      },
+      colorPicker(options){
         function ColorPicker(settings) {
             function Layer() {
               scope = {};
@@ -597,7 +579,7 @@ class Audinetype{
               };
             }
             function link() {
-              if (doc.quad) {
+              if (document.quad) {
                 return doc.quad;
               }
               var self = {};
@@ -2284,54 +2266,55 @@ class Audinetype{
           return riakNodes;
         };
         return ColorPicker.attachToInputByClass(__this.element, options)
-    }
-  todoList(){
-    let todoItems = []
-    let remaining = todoItems.filter(todoItem => !todoItem.completed).length
-    let divTodo = doc.createElement('div')
-    divTodo.innerHTML  = `<header class="header">
-      <input type="text" class="new-todo" placeholder="Ajouter une tache"><button class="plus">add</button>
-    </header>
-    <div class="main">
-      <ol class="todo-list"></ol>
-    </div>
-    <footer class="footer"></footer>`
-    doc.body.appendChild(divTodo)
-    let input = doc.querySelector("header input.new-todo")
-    let value = input.value
-    function newLi(){
-      let input = doc.querySelector("header input.new-todo")
-      let value = input.value
-      let ol = doc.querySelector("ol.todo-list")
-      let li = doc.createElement('li')
-      li.innerHTML = `<input type="checkbox" class="toggle">
-      <label><h1>${ value }</h1></label>`
-      ol.appendChild(li)
-    }
-    while(true){
-      let inputToggles = doc.querySelectorAll("input.toggle")
-      inputToggles.forEach((inputToggle) => {
-        if(inputToggle.checked === true){
-          doc.querySelectorAll("label h1").forEach((labelH1) => {
-            labelH1.classList.add("bared")
+    },
+      todoList(){
+        let todoItems = []
+        let remaining = todoItems.filter(todoItem => !todoItem.completed).length
+        let divTodo = document.createElement('div')
+        divTodo.innerHTML  = `<header class="header">
+          <input type="text" class="new-todo" placeholder="Ajouter une tache"><button class="plus">add</button>
+        </header>
+        <div class="main">
+          <ul class="todo-list"></ul>
+        </div>
+        <footer class="footer"></footer>`
+        document.body.appendChild(divTodo)
+        let input = document.querySelector("header input.new-todo")
+        let value = input.value
+        function newLi(){
+          let input = document.querySelector("header input.new-todo")
+          let value = input.value
+          let ul = document.querySelector("ul.todo-list")
+          let li = document.createElement('li')
+          li.innerHTML = `<input type="checkbox" class="toggle">
+          <label><h1>${ value }</h1></label>`
+          ul.appendChild(li)
+        }
+        while(true){
+          let inputToggles = document.querySelectorAll("input.toggle")
+          inputToggles.forEach((inputToggle) => {
+            if(inputToggle.checked === true){
+              document.querySelectorAll("label h1").forEach((labelH1) => {
+                labelH1.classList.add("bared")
+              })
+            }
           })
         }
-      })
-    }
-    
-    doc.querySelector("header.header button.plus").addEventListener('click', function(){
-      if(input.value == "") return false
-      else{
-        newLi()
-        todoItems.push({
-          completed: false,
-          name: input.value
+        document.querySelector("header.header button.plus").addEventListener('click', function(){
+          if(input.value == "") return false
+          else{
+            newLi()
+            todoItems.push({
+              completed: false,
+              name: input.value
+            })
+            input.value = ""
+            remaining = todoItems.filter(todoItem => !todoItem.completed).length
+            document.querySelector("footer.footer").innerHTML = `<span><strong>${ remaining }</strong> tâche${ remaining > 1 ? 's':'' } à faire</span>`
+          }
         })
-        input.value = ""
-        remaining = todoItems.filter(todoItem => !todoItem.completed).length
-        doc.querySelector("footer.footer").innerHTML = `<span><strong>${ remaining }</strong> tâche${ remaining > 1 ? 's':'' } à faire</span>`
       }
-    })
+    }
   }
 }
 class CarouselTouchPlugin{
@@ -2507,7 +2490,7 @@ class Carousel{
         }
     }
     createDivWithClass(className){
-        let div = doc.createElement('div')
+        let div = document.createElement('div')
         div.setAttribute('class', className)
         return div
     }
@@ -2531,7 +2514,7 @@ class Game{
             this.timer = 999
             this.decrement()
         }
-        this.canvas = doc.createElement('canvas')
+        this.canvas = document.createElement('canvas')
         this.context = Canvas.getContext(contexts)
         this.canvas.style.width = this.options.sizeWidth
         this.canvas.style.height = this.options.sizeHeight
@@ -2553,8 +2536,5 @@ function Game3D(object){
     return new Game("3d", object)
 }
 function $A(element, all){
-    return new Audinetype(element, all)
+    return new Audine(element, all).Type
 }
-doc.addEventListener("DOMContentLoaded", function(){
-    setTimeout(function(){console.log("[AudineType]: Merci de m'utiliser 😃\nTu peux utiliser Xaria ma capine l'intelligence artificielle")}, 100)
-})
