@@ -10,12 +10,12 @@ AudineType est un Framework JavaScript
 
 Marche avec Discord car nous avons configurée ***(Tout est dans le code Merci)***
 # Idée du code à faire
-```
+```javascript
 $A(element, all) <- Se qui utiser
 ```
 Toute les methodes de AudineType Version 0.5
 ## Version 0.5
-```
+```javascript
 /\JS/\
 $A().cap()
 $A(element, all).colorPicker({alpha_slider : , size : })
